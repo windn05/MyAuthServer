@@ -11,21 +11,18 @@ import reactor.core.publisher.Mono;
 @Repository
 public class UserRepository {
     private WebClient webClient;
-
     private String apiKey;
 
     public UserRepository(WebClient.Builder webClientBuilder, @Value("${api.secret}") String apiKey) {
-        this.webClient = webClientBuilder.baseUrl("http://host.docker.internal:8085/auth/api")
+        this.webClient = webClientBuilder.baseUrl("http://host.docker.internal:8080/auth/api")
                 .build();
         this.apiKey = apiKey;
     }
     public Mono<LoginResponseDto> findByUserId(String userId) {
-
         return this.webClient.get().uri("/{userId}", userId)
                 .header("X-API-Key", this.apiKey)
                 .retrieve()
                 .bodyToMono(LoginResponseDto.class)
-
                 .doOnSuccess(loginRequestDto -> {
                     System.out.println("API 요청 성공");
                 })

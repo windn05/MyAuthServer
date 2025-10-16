@@ -7,5 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 public class TokenResponseDto {
     private final String token;
+    private String userName;
     private String message;
+
 }
