@@ -2,6 +2,7 @@ package com.example.auth.Service;
 
 import com.example.auth.JwtSecurity.JwtProvider;
 import com.example.auth.Repository.UserRepository;
+import com.example.auth.dto.TokenResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,13 +17,16 @@ public class AuthService {
     private final JwtProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public Mono<String> login(String userId, String password) {
+    public Mono<TokenResponseDto> login(String userId, String password) {
         return userRepository.findByUserId(userId)
                 .flatMap(LoginResponseDto -> {
                     // 2. 가져온 해시와 입력된 비밀번호를 비교
                     if (passwordEncoder.matches(password, LoginResponseDto.getPasswordHash())) {
                         // 3. 비밀번호 일치 시, JWT 토큰 생성
-                        return Mono.just(jwtTokenProvider.createToken(userId));
+                        String token = jwtTokenProvider.createToken(userId);
+                        String username = LoginResponseDto.getUserName();
+
+                        return Mono.just(new TokenResponseDto(token, username, "success"));
                     } else {
                         return Mono.error(new BadCredentialsException("유효하지 않은 인증정보입니다."));
                     }

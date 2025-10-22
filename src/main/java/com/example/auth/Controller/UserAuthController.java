@@ -1,7 +1,5 @@
 package com.example.auth.Controller;
 
-
-
 import com.example.auth.Service.AuthService;
 import com.example.auth.dto.TokenResponseDto;
 import com.example.auth.dto.LoginRequestDto;
@@ -26,13 +24,10 @@ public class UserAuthController {
         // 로그인 성공 시 JWT 토큰을 받아서 응답 객체 생성
         // 로그인 실패 시 HTTP 상태 코드와 메시지 반환
 
-        return authService.login(dto.getUserid(), dto.getPassword())
-                .map(jwtToken -> {
-                    TokenResponseDto responseDto = new TokenResponseDto(jwtToken,"success");
-                    return ResponseEntity.ok(responseDto);
-                })
+        return authService.login(dto.getUserId(), dto.getPassword())
+                .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
-                    TokenResponseDto errorResponse = new TokenResponseDto(null, "Invalid credentials");
+                    TokenResponseDto errorResponse = new TokenResponseDto(null, null, "Invalid credentials");
                     return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
                 });
     }
